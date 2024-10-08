@@ -7,3 +7,11 @@ CREATE TABLE "Tenant" (
 
     CONSTRAINT "Tenant_pkey" PRIMARY KEY ("TenantID")
 );
+
+-- CreateTable
+CREATE TABLE "Sample" (
+    "SampleID" TEXT NOT NULL,
+    "Nome" TEXT NOT NULL,
+
+    CONSTRAINT "Sample_pkey" PRIMARY KEY ("SampleID")
+);

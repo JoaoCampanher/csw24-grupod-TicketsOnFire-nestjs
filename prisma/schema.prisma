@@ -13,3 +13,8 @@ model Tenant {
   InformacoesDeContato  String
   ConfiguracoesEspecificas String
 }
+
+model Sample {
+  SampleID              String       @id @default(uuid())
+  Nome                  String
+}
