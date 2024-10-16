@@ -8,10 +8,70 @@ datasource db {
 }
 
 model Tenant {
-  TenantID              String       @id @default(cuid())
-  Nome                  String
-  InformacoesDeContato  String
+  TenantID                Int       @id @default(autoincrement())
+  Nome                    String
+  InformacoesDeContato     String
   ConfiguracoesEspecificas String
+  usuarios                Usuario[]    
+  eventos                 Evento[]     
+  tickets                 Ticket[]    
+  transacoes              Transacao[]  
+}
+
+model Usuario {
+  UserID                  Int       @id @default(autoincrement())
+  TenantID                Int
+  Nome                    String
+  Email                   String    @unique
+  tenant                  Tenant    @relation(fields: [TenantID], references: [TenantID])
+  ticketsVendidos         Ticket[]  @relation("UsuarioVendedor")
+  transacoesCompradas     Transacao[]  @relation("UsuarioComprador")
+  preferenciasDeNotificacao PreferenciasDeNotificacao?
+}
+
+model Evento {
+  EventoID                Int       @id @default(autoincrement())
+  TenantID                Int
+  NomeDoEvento            String
+  Tipo                    String
+  Localizacao             String
+  DataEHora               DateTime
+  tenant                  Tenant    @relation(fields: [TenantID], references: [TenantID])
+  tickets                 Ticket[] 
+}
+
+model Ticket {
+  TicketID                Int       @id @default(autoincrement())
+  EventoID                Int
+  TenantID                Int
+  PrecoOriginal           Float
+  IDDoVendedor            Int
+  CodigoUnicoDeVerificacao String
+  Status                  String
+  evento                  Evento    @relation(fields: [EventoID], references: [EventoID])
+  tenant                  Tenant    @relation(fields: [TenantID], references: [TenantID])
+  vendedor                Usuario   @relation("UsuarioVendedor", fields: [IDDoVendedor], references: [UserID])
+  transacao               Transacao?
+}
+
+model Transacao {
+  TransacaoID             Int       @id @default(autoincrement())
+  TenantID                Int
+  IDDoComprador           Int
+  IDDoTicket              Int       @unique
+  PrecoDeVenda            Float
+  DataDaTransacao         DateTime
+  StatusDaTransacao       String
+  tenant                  Tenant    @relation(fields: [TenantID], references: [TenantID])
+  comprador               Usuario   @relation("UsuarioComprador", fields: [IDDoComprador], references: [UserID])
+  ticket                  Ticket    @relation(fields: [IDDoTicket], references: [TicketID])
+}
+
+model PreferenciasDeNotificacao {
+  PreferenciasID          Int       @id @default(autoincrement())
+  UserID                  Int       @unique
+  ReceberEmails           Boolean
+  usuario                 Usuario   @relation(fields: [UserID], references: [UserID])
 }
 
 model Sample {
