@@ -4,9 +4,19 @@ import { UserModule } from './user/user.module';
 import { TenantModule } from './tenant/tenant.module';
 import { EventModule } from './event/event.module';
 import { TicketModule } from './ticket/ticket.module';
+import { TransactionModule } from './transaction/transaction.module';
+import { PreferencesModule } from './preferences/preferences.module';
 
 @Module({
-  imports: [SampleModule, UserModule, TenantModule, EventModule, TicketModule],
+  imports: [
+    SampleModule,
+    UserModule,
+    TenantModule,
+    EventModule,
+    TicketModule,
+    TransactionModule,
+    PreferencesModule,
+  ],
   providers: [],
   controllers: [],
 })
