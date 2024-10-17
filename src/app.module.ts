@@ -9,9 +9,9 @@ import { PreferencesModule } from './preferences/preferences.module';
 
 @Module({
   imports: [
-    SampleModule,
-    UserModule,
+    // SampleModule,
     TenantModule,
+    UserModule,
     EventModule,
     TicketModule,
     TransactionModule,
