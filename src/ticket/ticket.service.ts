@@ -14,7 +14,7 @@ export class TicketService {
         PrecoOriginal: createTicketDTO.precoOriginal,
         IDDoVendedor: createTicketDTO.idDoVendedor,
         CodigoUnicoDeVerificacao: createTicketDTO.codigoUnicoDeVerificacao,
-        Status: createTicketDTO.status,
+        Status: 'AVAILABLE',
       },
     });
   }

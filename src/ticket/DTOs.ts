@@ -15,9 +15,6 @@ export class CreateTicketDTO {
 
   @ApiProperty({ example: 'ABC123' })
   codigoUnicoDeVerificacao: string;
-
-  @ApiProperty({ example: 'Available' })
-  status: string;
 }
 
 export class UpdateTicketDTO {
