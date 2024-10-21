@@ -18,6 +18,9 @@ export class CreateEventDTO {
 }
 
 export class UpdateEventDTO {
+  @ApiProperty({ example: 1 })
+  id: number;
+
   @ApiProperty({ example: 'Music Concert' })
   nomeDoEvento: string;
 

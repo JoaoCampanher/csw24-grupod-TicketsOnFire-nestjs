@@ -32,10 +32,7 @@ export class EventController {
   }
 
   @Put(':id')
-  async updateEvent(
-    @Param('id') id: number,
-    @Body() updateEventDTO: UpdateEventDTO,
-  ) {
-    return this.eventService.updateEvent(id, updateEventDTO);
+  async updateEvent(@Body() updateEventDTO: UpdateEventDTO) {
+    return this.eventService.updateEvent(updateEventDTO);
   }
 }

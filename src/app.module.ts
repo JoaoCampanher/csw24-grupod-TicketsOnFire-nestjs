@@ -7,8 +7,10 @@ import { TransactionModule } from './transaction/transaction.module';
 import { PreferencesModule } from './preferences/preferences.module';
 import { BuyModule } from './buy/buy.module';
 import { SellModule } from './sell/sell.module';
+import { ManagerController } from './manager/manager.controller';
+import { ManagerModule } from './manager/manager.module';
 
-const modules = [BuyModule, SellModule];
+const modules = [BuyModule, SellModule, ManagerModule];
 
 if (process.env.COMPLETE_CRUD === 'true') {
   modules.push(
@@ -26,6 +28,6 @@ if (process.env.COMPLETE_CRUD === 'true') {
 @Module({
   imports: modules,
   providers: [],
-  controllers: [],
+  controllers: [ManagerController],
 })
 export class AppModule {}

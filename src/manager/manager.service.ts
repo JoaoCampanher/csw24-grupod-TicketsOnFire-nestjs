@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateEventDTO, UpdateEventDTO } from 'src/event/DTOs';
 import { PrismaService } from 'src/prisma.service';
-import { CreateEventDTO, UpdateEventDTO } from './DTOs';
 
 @Injectable()
-export class EventService {
+export class ManagerService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createEvent(createEventDTO: CreateEventDTO) {
@@ -24,18 +24,6 @@ export class EventService {
         TenantID: createEventDTO.tenantId,
       },
     });
-  }
-
-  async getEvent(id: number) {
-    const existingEvent = await this.prisma.evento.findUnique({
-      where: {
-        EventoID: Number(id),
-      },
-    });
-    if (!existingEvent) {
-      throw new NotFoundException('Event not found');
-    }
-    return existingEvent;
   }
 
   async deleteEvent(id: number) {
