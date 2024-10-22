@@ -56,6 +56,9 @@ export class EventService {
       where: {
         TicketID: Number(BuyTicketDto.ticketId),
       },
+      include: {
+        transacao: true,
+      },
     });
 
     if (!ticket) {
@@ -65,13 +68,12 @@ export class EventService {
     if (ticket.Status !== 'AVAILABLE') {
       throw new NotAcceptableException('Ticket not available');
     }
+
+    if (ticket.transacao) {
+      throw new NotAcceptableException('Ticket already has a transaction');
+    }
+
     this.prisma.$transaction([
-      this.prisma.ticket.update({
-        where: { TicketID: Number(BuyTicketDto.ticketId) },
-        data: {
-          Status: 'SOLD',
-        },
-      }),
       this.prisma.transacao.create({
         data: {
           DataDaTransacao: new Date(),
@@ -80,6 +82,13 @@ export class EventService {
           IDDoComprador: BuyTicketDto.userId,
           IDDoTicket: BuyTicketDto.ticketId,
           TenantID: user.tenant.TenantID,
+        },
+      }),
+      this.prisma.ticket.update({
+        where: { TicketID: Number(BuyTicketDto.ticketId) },
+        data: {
+          Status: 'SOLD',
+          
         },
       }),
     ]);
