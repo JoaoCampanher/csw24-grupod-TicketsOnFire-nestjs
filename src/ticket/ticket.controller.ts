@@ -9,12 +9,27 @@ import {
 } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateTicketDTO, UpdateTicketDTO, UseTicketDTO } from './DTOs';
+import {
+  CreateTicketDTO,
+  RefundTicketDto,
+  UpdateTicketDTO,
+  UseTicketDTO,
+} from './DTOs';
 
 @ApiTags('Ticket')
 @Controller('ticket')
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
+
+  @Get('bought/:userId')
+  async getBoughtTickets(@Param('userId') userId: number) {
+    return this.ticketService.getBoughtTickets(userId);
+  }
+
+  @Post('refund')
+  async refundTicket(@Body() refundTicketDto: RefundTicketDto) {
+    return this.ticketService.refundTicket(refundTicketDto);
+  }
 
   @Post()
   async useTicket(@Body() useTicketDTO: UseTicketDTO) {

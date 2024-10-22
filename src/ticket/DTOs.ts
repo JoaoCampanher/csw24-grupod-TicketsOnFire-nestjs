@@ -4,6 +4,12 @@ export class UseTicketDTO {
   @ApiProperty({ example: 1 })
   id: number;
 }
+
+export class RefundTicketDto {
+  @ApiProperty({ example: 1 })
+  transactionId: number;
+}
+
 export class CreateTicketDTO {
   @ApiProperty({ example: 1 })
   eventoId: number;
