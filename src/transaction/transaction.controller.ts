@@ -35,4 +35,9 @@ export class TransactionController {
   async updateTransaction(@Body() updateTransactionDTO: UpdateTransactionDTO) {
     return this.transactionService.updateTransaction(updateTransactionDTO);
   }
+
+  @Get('getBalance/:userId')
+  async getBalance(@Param('userId') userId: number) {
+    return this.transactionService.getBalance(userId);
+  }
 }

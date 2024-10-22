@@ -62,4 +62,38 @@ export class TransactionService {
       },
     });
   }
+
+  async getBalance(userId: number) {
+    const tickets = await this.prisma.ticket.findMany({
+      where: {
+        IDDoVendedor: Number(userId),
+      },
+      include: {
+        transacao: true,
+      },
+    });
+    let balance = 0;
+    console
+    tickets.forEach((t) => {
+      if (!t.transacao || t.transacao.StatusDaTransacao !== 'SUCCESS') {
+        return;
+      }
+      balance += t.transacao.PrecoDeVenda;
+    });
+
+    const paidTransactions = await this.prisma.transacao.findMany({
+      where: {
+        IDDoComprador: Number(userId),
+      },
+    });
+    console.log(balance, JSON.stringify(paidTransactions));
+    paidTransactions.forEach((t) => {
+      if (t.StatusDaTransacao !== 'SUCCESS') {
+        return;
+      }
+      balance -= t.PrecoDeVenda;
+    });
+    console.log(balance);
+    return { balance };
+  }
 }
