@@ -5,6 +5,7 @@ import { EventModule } from './event/event.module';
 import { TicketModule } from './ticket/ticket.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { PreferencesModule } from './preferences/preferences.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PreferencesModule } from './preferences/preferences.module';
     TicketModule,
     TransactionModule,
     PreferencesModule,
+    ReviewModule,
   ],
   providers: [],
   controllers: [],
