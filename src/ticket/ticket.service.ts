@@ -92,6 +92,44 @@ export class TicketService {
   }
 
   async createTicket(createTicketDTO: CreateTicketDTO) {
+    const event = await this.prisma.evento.findUnique({
+      where: {
+        EventoID: createTicketDTO.eventoId,
+      },
+      include: {
+        tenant: true,
+      },
+    });
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+    const tenant = await this.prisma.tenant.findUnique({
+      where: {
+        TenantID: createTicketDTO.tenantId,
+      },
+    });
+    if (!tenant) {
+      throw new NotFoundException('Tenant not found');
+    }
+    const seller = await this.prisma.usuario.findUnique({
+      where: {
+        UserID: createTicketDTO.idDoVendedor,
+      },
+      include: {
+        tenant: true,
+      },
+    });
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+
+    if (
+      event.tenant.TenantID !== tenant.TenantID ||
+      seller.tenant.TenantID !== tenant.TenantID
+    ) {
+      throw new NotAcceptableException('Tenant mismatch');
+    }
+
     return this.prisma.ticket.create({
       data: {
         EventoID: createTicketDTO.eventoId,

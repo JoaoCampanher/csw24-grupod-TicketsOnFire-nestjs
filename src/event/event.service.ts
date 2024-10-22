@@ -25,16 +25,16 @@ export class EventService {
   }
 
   async getAvailableTickets(eventId: number) {
-    const existingTenant = await this.prisma.evento.findUnique({
+    const existingEvent = await this.prisma.evento.findUnique({
       where: {
         EventoID: Number(eventId),
       },
     });
-    if (!existingTenant) {
-      throw new NotFoundException('Tenant not found');
+    if (!existingEvent) {
+      throw new NotFoundException('Event not found');
     }
     return this.prisma.ticket.findMany({
-      where: { TenantID: Number(eventId), Status: 'AVAILABLE' },
+      where: { EventoID: Number(eventId), Status: 'AVAILABLE' },
     });
   }
 
@@ -88,7 +88,6 @@ export class EventService {
         where: { TicketID: Number(BuyTicketDto.ticketId) },
         data: {
           Status: 'SOLD',
-          
         },
       }),
     ]);

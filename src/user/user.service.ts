@@ -14,6 +14,13 @@ export class UserService {
     if (!existingTenant) {
       throw new NotFoundException('Tenant not found');
     }
+    const emailExists = await this.prisma.usuario.findUnique({
+      where: { Email: createUserDTO.email },
+    });
+    if (emailExists) {
+      throw new NotFoundException('Email already exists');
+    }
+    
     return this.prisma.usuario.create({
       data: {
         Nome: createUserDTO.nome,
