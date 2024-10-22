@@ -58,7 +58,7 @@ model Transacao {
   TransacaoID             Int       @id @default(autoincrement())
   TenantID                Int
   IDDoComprador           Int
-  IDDoTicket              Int       @unique
+  IDDoTicket              Int       
   PrecoDeVenda            Float
   DataDaTransacao         DateTime
   StatusDaTransacao       String
