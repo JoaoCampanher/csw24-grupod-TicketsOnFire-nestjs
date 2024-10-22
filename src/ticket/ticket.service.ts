@@ -1,10 +1,95 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateTicketDTO, UpdateTicketDTO } from './DTOs';
+import {
+  CreateTicketDTO,
+  RefundTicketDto,
+  UpdateTicketDTO,
+  UseTicketDTO,
+} from './DTOs';
 
 @Injectable()
 export class TicketService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getBoughtTickets(userId: number) {
+    const user = await this.prisma.usuario.findUnique({
+      where: {
+        UserID: Number(userId),
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.prisma.transacao.findMany({
+      where: {
+        IDDoComprador: Number(userId),
+        StatusDaTransacao: 'SOLD',
+      },
+    });
+  }
+
+  async refundTicket(useTicketDTO: RefundTicketDto) {
+    const transaction = await this.prisma.transacao.findUnique({
+      where: {
+        TransacaoID: Number(useTicketDTO.transactionId),
+      },
+      include: {
+        comprador: true,
+        ticket: true,
+      },
+    });
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (transaction.StatusDaTransacao !== 'SUCCESS') {
+      throw new NotAcceptableException(
+        'For refund, transaction must have been successful',
+      );
+    }
+
+    return this.prisma.$transaction([
+      this.prisma.ticket.update({
+        where: { TicketID: Number(transaction.ticket.TicketID) },
+        data: {
+          Status: 'AVAILABLE',
+        },
+      }),
+
+      this.prisma.transacao.update({
+        where: {
+          TransacaoID: Number(useTicketDTO.transactionId),
+        },
+        data: {
+          StatusDaTransacao: 'CANCELLED',
+        },
+      }),
+    ]);
+  }
+
+  async useTicket(useTicketDTO: UseTicketDTO) {
+    const ticket = await this.prisma.ticket.findUnique({
+      where: {
+        TicketID: Number(useTicketDTO.ticketId),
+      },
+    });
+    if (!ticket) {
+      throw new NotFoundException('Ticket not found');
+    }
+    if (ticket.Status === 'USED') {
+      throw new NotAcceptableException('Ticket already used');
+    }
+    return this.prisma.ticket.update({
+      where: { TicketID: Number(useTicketDTO.ticketId) },
+      data: {
+        Status: 'USED',
+      },
+    });
+  }
 
   async createTicket(createTicketDTO: CreateTicketDTO) {
     return this.prisma.ticket.create({
@@ -14,7 +99,7 @@ export class TicketService {
         PrecoOriginal: createTicketDTO.precoOriginal,
         IDDoVendedor: createTicketDTO.idDoVendedor,
         CodigoUnicoDeVerificacao: createTicketDTO.codigoUnicoDeVerificacao,
-        Status: createTicketDTO.status,
+        Status: 'AVAILABLE',
       },
     });
   }

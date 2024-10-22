@@ -18,6 +18,9 @@ export class CreateEventDTO {
 }
 
 export class UpdateEventDTO {
+  @ApiProperty({ example: 1 })
+  id: number;
+
   @ApiProperty({ example: 'Music Concert' })
   nomeDoEvento: string;
 
@@ -29,4 +32,12 @@ export class UpdateEventDTO {
 
   @ApiProperty({ example: '2024-12-01T20:00:00.000Z' })
   dataEHora: Date;
+}
+
+export class BuyTicketDto {
+  @ApiProperty({ example: 1 })
+  userId: number;
+
+  @ApiProperty({ example: 2 })
+  ticketId: number;
 }

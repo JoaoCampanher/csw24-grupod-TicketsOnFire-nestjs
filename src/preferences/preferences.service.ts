@@ -43,21 +43,18 @@ export class PreferencesService {
     });
   }
 
-  async updatePreferences(
-    id: number,
-    updatePreferencesDTO: UpdatePreferencesDTO,
-  ) {
+  async updatePreferences(updatePreferencesDTO: UpdatePreferencesDTO) {
     const existingPreferences =
       await this.prisma.preferenciasDeNotificacao.findUnique({
         where: {
-          PreferenciasID: Number(id),
+          PreferenciasID: Number(updatePreferencesDTO.preferencesId),
         },
       });
     if (!existingPreferences) {
       throw new NotFoundException('Preferências não encontradas');
     }
     return this.prisma.preferenciasDeNotificacao.update({
-      where: { PreferenciasID: Number(id) },
+      where: { PreferenciasID: Number(updatePreferencesDTO.preferencesId) },
       data: {
         ReceberEmails: updatePreferencesDTO.receberEmails,
       },

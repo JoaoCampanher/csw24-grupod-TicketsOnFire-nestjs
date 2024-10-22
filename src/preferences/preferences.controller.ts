@@ -32,10 +32,7 @@ export class PreferencesController {
   }
 
   @Put(':id')
-  async updatePreferences(
-    @Param('id') id: number,
-    @Body() updatePreferencesDTO: UpdatePreferencesDTO,
-  ) {
-    return this.preferencesService.updatePreferences(id, updatePreferencesDTO);
+  async updatePreferences(@Body() updatePreferencesDTO: UpdatePreferencesDTO) {
+    return this.preferencesService.updatePreferences(updatePreferencesDTO);
   }
 }

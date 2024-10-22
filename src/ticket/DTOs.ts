@@ -1,5 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class UseTicketDTO {
+  @ApiProperty({ example: 1 })
+  ticketId: number;
+}
+
+export class RefundTicketDto {
+  @ApiProperty({ example: 1 })
+  transactionId: number;
+}
+
 export class CreateTicketDTO {
   @ApiProperty({ example: 1 })
   eventoId: number;
@@ -15,9 +25,6 @@ export class CreateTicketDTO {
 
   @ApiProperty({ example: 'ABC123' })
   codigoUnicoDeVerificacao: string;
-
-  @ApiProperty({ example: 'Available' })
-  status: string;
 }
 
 export class UpdateTicketDTO {

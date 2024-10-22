@@ -9,6 +9,9 @@ export class CreatePreferencesDTO {
 }
 
 export class UpdatePreferencesDTO {
+  @ApiProperty({ example: 1 })
+  preferencesId: number;
+
   @ApiProperty({ example: true })
   receberEmails: boolean;
 }
