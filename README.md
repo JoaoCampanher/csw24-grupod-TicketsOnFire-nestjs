@@ -2,9 +2,6 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
 ### Passos para rodar o projeto
 
 Primeiramente, inicialize o AWS Lab e altere o arquivo `main.tf` substituindo as credenciais pelas fornecidas no seu lab.
