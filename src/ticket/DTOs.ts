@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UseTicketDTO {
   @ApiProperty({ example: 1 })
-  id: number;
+  ticketId: number;
 }
 
 export class RefundTicketDto {

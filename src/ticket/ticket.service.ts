@@ -74,7 +74,7 @@ export class TicketService {
   async useTicket(useTicketDTO: UseTicketDTO) {
     const ticket = await this.prisma.ticket.findUnique({
       where: {
-        TicketID: Number(useTicketDTO.id),
+        TicketID: Number(useTicketDTO.ticketId),
       },
     });
     if (!ticket) {
@@ -84,7 +84,7 @@ export class TicketService {
       throw new NotAcceptableException('Ticket already used');
     }
     return this.prisma.ticket.update({
-      where: { TicketID: Number(useTicketDTO.id) },
+      where: { TicketID: Number(useTicketDTO.ticketId) },
       data: {
         Status: 'USED',
       },

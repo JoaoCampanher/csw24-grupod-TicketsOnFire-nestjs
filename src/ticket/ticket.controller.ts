@@ -31,7 +31,7 @@ export class TicketController {
     return this.ticketService.refundTicket(refundTicketDto);
   }
 
-  @Post()
+  @Post('useTicket')
   async useTicket(@Body() useTicketDTO: UseTicketDTO) {
     return this.ticketService.useTicket(useTicketDTO);
   }
