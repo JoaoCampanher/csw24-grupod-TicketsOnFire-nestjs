@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDTO } from './DTOs';
 
@@ -18,9 +22,9 @@ export class UserService {
       where: { Email: createUserDTO.email },
     });
     if (emailExists) {
-      throw new NotFoundException('Email already exists');
+      throw new NotAcceptableException('Email already exists');
     }
-    
+
     return this.prisma.usuario.create({
       data: {
         Nome: createUserDTO.nome,
