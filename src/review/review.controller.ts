@@ -11,10 +11,15 @@ import { ReviewService } from './review.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateReviewDTO, UpdateReviewDTO } from './DTOs';
 
-@ApiTags('Avaliação')
+@ApiTags('Review')
 @Controller('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
+
+  @Get('getSellerReviews/:sellerId')
+  async getReviews(@Param('sellerId') sellerId: number) {
+    return this.reviewService.getReviews(sellerId);
+  }
 
   @Post()
   async createReview(@Body() createReviewDTO: CreateReviewDTO) {

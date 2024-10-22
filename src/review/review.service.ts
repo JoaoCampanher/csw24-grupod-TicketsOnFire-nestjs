@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateReviewDTO, UpdateReviewDTO } from './DTOs';
 
@@ -6,7 +10,49 @@ import { CreateReviewDTO, UpdateReviewDTO } from './DTOs';
 export class ReviewService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getReviews(sellerId: number) {
+    const seller = await this.prisma.usuario.findUnique({
+      where: {
+        UserID: sellerId,
+      },
+    });
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+    return this.prisma.avaliacao.findMany({
+      where: {
+        IdDoVendedor: sellerId,
+      },
+    });
+  }
+
   async createReview(createReviewDTO: CreateReviewDTO) {
+    const buyer = await this.prisma.usuario.findUnique({
+      where: {
+        UserID: createReviewDTO.buyerId,
+      },
+    });
+    if (!buyer) {
+      throw new NotFoundException('Buyer not found');
+    }
+    const seller = await this.prisma.usuario.findUnique({
+      where: {
+        UserID: createReviewDTO.sellerId,
+      },
+    });
+    if (!seller) {
+      throw new NotFoundException('Seller not found');
+    }
+    const existingReview = await this.prisma.avaliacao.findFirst({
+      where: {
+        IdDoVendedor: createReviewDTO.sellerId,
+        IdDoComprador: createReviewDTO.buyerId,
+      },
+    });
+    if (existingReview) {
+      throw new NotAcceptableException('Review already exists');
+    }
+
     return this.prisma.avaliacao.create({
       data: {
         IdDoVendedor: createReviewDTO.sellerId,
