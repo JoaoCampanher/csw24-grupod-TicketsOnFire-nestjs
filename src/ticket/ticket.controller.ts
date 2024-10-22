@@ -51,11 +51,8 @@ export class TicketController {
     return this.ticketService.deleteTicket(id);
   }
 
-  @Put(':id')
-  async updateTicket(
-    @Param('id') id: number,
-    @Body() updateTicketDTO: UpdateTicketDTO,
-  ) {
-    return this.ticketService.updateTicket(id, updateTicketDTO);
+  @Put()
+  async updateTicket(@Body() updateTicketDTO: UpdateTicketDTO) {
+    return this.ticketService.updateTicket(updateTicketDTO);
   }
 }

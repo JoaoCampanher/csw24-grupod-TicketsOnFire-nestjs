@@ -168,17 +168,17 @@ export class TicketService {
     });
   }
 
-  async updateTicket(id: number, updateTicketDTO: UpdateTicketDTO) {
+  async updateTicket(updateTicketDTO: UpdateTicketDTO) {
     const existingTicket = await this.prisma.ticket.findUnique({
       where: {
-        TicketID: Number(id),
+        TicketID: Number(updateTicketDTO.id),
       },
     });
     if (!existingTicket) {
       throw new NotFoundException('Ticket not found');
     }
     return this.prisma.ticket.update({
-      where: { TicketID: Number(id) },
+      where: { TicketID: Number(updateTicketDTO.id) },
       data: {
         PrecoOriginal: updateTicketDTO.precoOriginal,
         Status: updateTicketDTO.status,

@@ -27,6 +27,8 @@ model Usuario {
   ticketsVendidos         Ticket[]  @relation("UsuarioVendedor")
   transacoesCompradas     Transacao[]  @relation("UsuarioComprador")
   preferenciasDeNotificacao PreferenciasDeNotificacao?
+  avaliacoesRecebidas     Avaliacao[] @relation("AvaliacaoVendedor")
+  avaliacoesFeitas        Avaliacao[] @relation("AvaliacaoComprador")
 }
 
 model Evento {
@@ -72,6 +74,16 @@ model PreferenciasDeNotificacao {
   UserID                  Int       @unique
   ReceberEmails           Boolean
   usuario                 Usuario   @relation(fields: [UserID], references: [UserID])
+}
+
+model Avaliacao {
+  AvaliacaoID             Int       @id @default(autoincrement())
+  IdDoVendedor            Int
+  IdDoComprador           Int
+  Nota                    Int
+  Comentario              String
+  vendedor                Usuario   @relation("AvaliacaoVendedor", fields: [IdDoVendedor], references: [UserID])
+  comprador               Usuario   @relation("AvaliacaoComprador", fields: [IdDoComprador], references: [UserID])
 }
 
 model Sample {

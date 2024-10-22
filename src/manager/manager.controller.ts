@@ -24,7 +24,7 @@ export class ManagerController {
     return this.managerService.deleteEvent(id);
   }
 
-  @Put(':id')
+  @Put()
   async updateEvent(@Body() updateEventDTO: UpdateEventDTO) {
     return this.managerService.updateEvent(updateEventDTO);
   }

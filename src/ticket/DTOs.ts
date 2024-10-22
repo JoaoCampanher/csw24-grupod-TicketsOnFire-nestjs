@@ -28,6 +28,9 @@ export class CreateTicketDTO {
 }
 
 export class UpdateTicketDTO {
+  @ApiProperty({ example: 1 })
+  id: number;
+
   @ApiProperty({ example: 150.0 })
   precoOriginal: number;
 

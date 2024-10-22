@@ -46,7 +46,7 @@ export class EventController {
     return this.eventService.deleteEvent(id);
   }
 
-  @Put(':id')
+  @Put()
   async updateEvent(@Body() updateEventDTO: UpdateEventDTO) {
     return this.eventService.updateEvent(updateEventDTO);
   }

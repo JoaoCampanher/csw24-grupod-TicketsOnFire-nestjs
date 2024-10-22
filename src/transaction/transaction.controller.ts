@@ -31,11 +31,8 @@ export class TransactionController {
     return this.transactionService.deleteTransaction(id);
   }
 
-  @Put(':id')
-  async updateTransaction(
-    @Param('id') id: number,
-    @Body() updateTransactionDTO: UpdateTransactionDTO,
-  ) {
-    return this.transactionService.updateTransaction(id, updateTransactionDTO);
+  @Put()
+  async updateTransaction(@Body() updateTransactionDTO: UpdateTransactionDTO) {
+    return this.transactionService.updateTransaction(updateTransactionDTO);
   }
 }

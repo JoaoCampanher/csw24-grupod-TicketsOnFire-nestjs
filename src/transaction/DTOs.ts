@@ -21,6 +21,9 @@ export class CreateTransactionDTO {
 }
 
 export class UpdateTransactionDTO {
+  @ApiProperty({ example: 1 })
+  id: number;
+
   @ApiProperty({ example: 150.0 })
   salePrice: number;
 

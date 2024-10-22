@@ -31,7 +31,7 @@ export class PreferencesController {
     return this.preferencesService.deletePreferences(id);
   }
 
-  @Put(':id')
+  @Put()
   async updatePreferences(@Body() updatePreferencesDTO: UpdatePreferencesDTO) {
     return this.preferencesService.updatePreferences(updatePreferencesDTO);
   }

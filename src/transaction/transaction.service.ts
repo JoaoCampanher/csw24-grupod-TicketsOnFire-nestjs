@@ -45,20 +45,17 @@ export class TransactionService {
     });
   }
 
-  async updateTransaction(
-    id: number,
-    updateTransactionDTO: UpdateTransactionDTO,
-  ) {
+  async updateTransaction(updateTransactionDTO: UpdateTransactionDTO) {
     const existingTransaction = await this.prisma.transacao.findUnique({
       where: {
-        TransacaoID: Number(id),
+        TransacaoID: Number(updateTransactionDTO.id),
       },
     });
     if (!existingTransaction) {
       throw new NotFoundException('Transação não encontrada');
     }
     return this.prisma.transacao.update({
-      where: { TransacaoID: Number(id) },
+      where: { TransacaoID: Number(updateTransactionDTO.id) },
       data: {
         PrecoDeVenda: updateTransactionDTO.salePrice,
         StatusDaTransacao: updateTransactionDTO.transactionStatus,
