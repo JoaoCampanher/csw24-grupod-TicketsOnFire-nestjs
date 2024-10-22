@@ -1,10 +1,34 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateTicketDTO, UpdateTicketDTO } from './DTOs';
+import { CreateTicketDTO, UpdateTicketDTO, UseTicketDTO } from './DTOs';
 
 @Injectable()
 export class TicketService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async useTicket(useTicketDTO: UseTicketDTO) {
+    const ticket = await this.prisma.ticket.findUnique({
+      where: {
+        TicketID: Number(useTicketDTO.id),
+      },
+    });
+    if (!ticket) {
+      throw new NotFoundException('Ticket not found');
+    }
+    if (ticket.Status === 'USED') {
+      throw new NotAcceptableException('Ticket already used');
+    }
+    return this.prisma.ticket.update({
+      where: { TicketID: Number(useTicketDTO.id) },
+      data: {
+        Status: 'USED',
+      },
+    });
+  }
 
   async createTicket(createTicketDTO: CreateTicketDTO) {
     return this.prisma.ticket.create({
