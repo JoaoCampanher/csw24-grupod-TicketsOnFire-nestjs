@@ -66,6 +66,17 @@ CREATE TABLE "PreferenciasDeNotificacao" (
 );
 
 -- CreateTable
+CREATE TABLE "Avaliacao" (
+    "AvaliacaoID" SERIAL NOT NULL,
+    "IdDoVendedor" INTEGER NOT NULL,
+    "IdDoComprador" INTEGER NOT NULL,
+    "Nota" INTEGER NOT NULL,
+    "Comentario" TEXT NOT NULL,
+
+    CONSTRAINT "Avaliacao_pkey" PRIMARY KEY ("AvaliacaoID")
+);
+
+-- CreateTable
 CREATE TABLE "Sample" (
     "SampleID" TEXT NOT NULL,
     "Nome" TEXT NOT NULL,
@@ -108,3 +119,9 @@ ALTER TABLE "Transacao" ADD CONSTRAINT "Transacao_IDDoTicket_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "PreferenciasDeNotificacao" ADD CONSTRAINT "PreferenciasDeNotificacao_UserID_fkey" FOREIGN KEY ("UserID") REFERENCES "Usuario"("UserID") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Avaliacao" ADD CONSTRAINT "Avaliacao_IdDoVendedor_fkey" FOREIGN KEY ("IdDoVendedor") REFERENCES "Usuario"("UserID") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Avaliacao" ADD CONSTRAINT "Avaliacao_IdDoComprador_fkey" FOREIGN KEY ("IdDoComprador") REFERENCES "Usuario"("UserID") ON DELETE RESTRICT ON UPDATE CASCADE;
