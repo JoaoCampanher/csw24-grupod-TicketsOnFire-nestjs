@@ -6,6 +6,7 @@ provider:
   name: aws
   runtime: nodejs16.x
   region: ap-southeast-2
+  stage: api
   memorySize: 2048
   logRetentionInDays: 5
   timeout: 30
