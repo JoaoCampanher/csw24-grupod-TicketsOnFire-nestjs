@@ -2,7 +2,7 @@ name: Test
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -17,36 +17,42 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: us-east-1 
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
     - name: Install Dependencies
       run: npm install
 
     - name: Build Application
       run: npm run build
 
-    # Build Docker image
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }} .
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
 
-    # Tag Docker image for ECR
-    - name: Tag Docker image for ECR
+    - name: SSH into EC2, Pull Latest Docker Image, and Restart Container
+      env:
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker tag ${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
+        # Set up SSH key and configure SSH
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
 
-    # Push Docker image to ECR
-    - name: Push Docker image to ECR
-      run: |
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
+        # SSH into EC2 and run commands to update Docker container
+        ssh -o StrictHostKeyChecking=no $SSH_USER@$EC2_HOST << 'EOF'
+          # Log in to AWS ECR
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
 
+          # Pull the latest Docker image from ECR
+          docker pull $ECR_REGISTRY/teste:$IMAGE_TAG
+
+          # Stop the currently running container (if exists)
+          docker ps -q -f name=teste | xargs -r docker stop
+
+          # Remove the old container (if exists)
+          docker ps -a -q -f name=teste | xargs -r docker rm
+
+          # Run the new container
+          docker run -d --name teste -p 80:80 $ECR_REGISTRY/teste:$IMAGE_TAG
+        EOF
