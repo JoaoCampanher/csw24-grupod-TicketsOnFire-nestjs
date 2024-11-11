@@ -9,14 +9,14 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy App
+    name: Deploy
     runs-on: ubuntu-latest
     environment: production
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -24,43 +24,23 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1 
-        
-    - name: Install Dependencies
-      run: npm install
-
-    - name: Build Application
-      run: npm run build
 
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: SSH into EC2, Pull Latest Docker Image, and Restart Container
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Build Application
+      run: npm run build
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
       env:
-        EC2_HOST: ${{ secrets.EC2_HOST }}
-        SSH_USER: ${{ secrets.SSH_USER }}
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Set up SSH key and configure SSH
-        mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-
-        # SSH into EC2 and run commands to update Docker container
-        ssh -o StrictHostKeyChecking=no $SSH_USER@$EC2_HOST << 'EOF'
-          # Log in to AWS ECR
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
-
-          # Pull the latest Docker image from ECR
-          docker pull $ECR_REGISTRY/teste:$IMAGE_TAG
-
-          # Stop the currently running container (if exists)
-          docker ps -q -f name=teste | xargs -r docker stop
-
-          # Remove the old container (if exists)
-          docker ps -a -q -f name=teste | xargs -r docker rm
-
-          # Run the new container
-          docker run -d --name teste -p 80:80 $ECR_REGISTRY/teste:$IMAGE_TAG
-        EOF
+        docker build -t $ECR_REGISTRY/teste:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/teste:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/teste:$IMAGE_TAG" >> $GITHUB_OUTPUT
