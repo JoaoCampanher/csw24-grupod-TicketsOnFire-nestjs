@@ -1,16 +1,16 @@
 services:
-  db:
-    image: postgres
-    restart: always
-    environment:
-      - POSTGRES_USER=ticketsonfire
-      - POSTGRES_PASSWORD=fire
-      - POSTGRES_DB=ticketsonfire
-    container_name: postgres
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
+  # db:
+  #   image: postgres
+  #   restart: always
+  #   environment:
+  #     - POSTGRES_USER=ticketsonfire
+  #     - POSTGRES_PASSWORD=fire
+  #     - POSTGRES_DB=ticketsonfire
+  #   container_name: postgres
+  #   volumes:
+  #     - ./pgdata:/var/lib/postgresql/data
+  #   ports:
+  #     - '5432:5432'
 
   app:
     build:
@@ -18,7 +18,7 @@ services:
       dockerfile: Dockerfile
     container_name: nest-docker-postgres
     environment:
-      - DATABASE_URL=postgresql://ticketsonfire:fire@db:5432/ticketsonfire?schema=public
+      - DATABASE_URL=postgresql://postgres:postgres@database-1.c5cvujhpvpl2.us-east-1.rds.amazonaws.com:5432/postgres
       - PORT=${PORT}
     ports:
       - '3000:3000'
