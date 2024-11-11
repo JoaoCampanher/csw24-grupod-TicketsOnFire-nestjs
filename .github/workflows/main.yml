@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy App
     runs-on: ubuntu-latest
     environment: production
 
@@ -30,7 +30,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Install Dependencies
-      run: npm ci
+      run: npm install
 
     - name: Build Application
       run: npm run build
