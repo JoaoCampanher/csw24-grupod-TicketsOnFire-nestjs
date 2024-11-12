@@ -28,8 +28,8 @@ jobs:
     - name: Install Dependencies
       run: npm install --production
 
-    - name: Build Application
-      run: npm run build
+    # - name: Build Application
+    #   run: npm run build
 
     - name: Install Serverless Framework
       run: npm -g install serverless@3
