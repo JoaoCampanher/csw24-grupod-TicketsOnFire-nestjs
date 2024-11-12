@@ -53,8 +53,8 @@ jobs:
       
     - name: Configure Serverless Credentials
       run: |
-        serverless config credentials --accessKeyId ${{ secrets.SERVERLESS_ACCESS_KEY_ID }} --secretAccessKey ${{ secrets.SERVERLESS_ACCESS_KEY_SECRET }} --provider aws --profile serverless
-        
+        export SERVERLESS_ACCESS_KEY=${{ secrets.SERVERLESS_ACCESS_KEY }}
+
     # Package the application using Serverless Framework
     - name: Serverless Package
       run: serverless package --stage production
