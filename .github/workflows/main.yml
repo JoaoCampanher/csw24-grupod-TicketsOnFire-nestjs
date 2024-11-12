@@ -25,39 +25,15 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1 
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
     - name: Install Dependencies
       run: npm install
 
     - name: Build Application
       run: npm run build
 
-    # Build Docker image
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }} .
-    # Tag Docker image for ECR
-    - name: Tag Docker image for ECR
-      run: |
-        docker tag ${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
-    # Push Docker image to ECR
-    - name: Push Docker image to ECR
-      run: |
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
-  
     - name: Install Serverless Framework
-      run: npm install -g serverless
-      env:
-        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}      
+      run: npm -g install serverless@3
       
     # Package the application using Serverless Framework
     - name: Serverless Package
-      run: serverless package --stage production
-
-    # Upload Serverless package to S3
-    - name: Upload Serverless package to S3
-      run: |
-        aws s3 cp ./serverless/.serverless/${{ github.sha }}.zip s3://${{ secrets.S3_BUCKET_NAME }}/${{ github.sha }}.zip
+      run: serverless deploy
