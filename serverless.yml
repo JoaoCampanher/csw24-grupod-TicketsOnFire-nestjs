@@ -31,3 +31,6 @@ functions:
 # individually: true
 # exclude:
 #   - node_modules/**
+package:
+  include:
+    - node_modules/@vendia/serverless-express/**
