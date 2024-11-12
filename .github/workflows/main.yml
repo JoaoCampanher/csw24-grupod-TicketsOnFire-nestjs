@@ -28,8 +28,8 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
-    - name: Build Application
-      run: npm install @vendia/serverless-express
+    - name: Generate Prisma Client
+      run: npx prisma generate
       
     - name: Build Application
       run: npm run build
