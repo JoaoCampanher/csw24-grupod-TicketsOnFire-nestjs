@@ -50,14 +50,7 @@ jobs:
   
     - name: Install Serverless Framework
       run: npm install -g serverless
-      env:
-        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}      
       
     # Package the application using Serverless Framework
     - name: Serverless Package
-      run: serverless package --stage production
-
-    # Upload Serverless package to S3
-    - name: Upload Serverless package to S3
-      run: |
-        aws s3 cp ./serverless/.serverless/${{ github.sha }}.zip s3://${{ secrets.S3_BUCKET_NAME }}/${{ github.sha }}.zip
+      run: serverless deploy
