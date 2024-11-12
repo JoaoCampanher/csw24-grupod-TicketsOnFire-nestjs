@@ -9,6 +9,8 @@ provider:
   region: us-east-1
   iam:
     role: arn:aws:iam::911970324056:role/LabRole
+  environment:
+    DATABASE_URL: 'postgresql://postgres:postgres@database-1.c5cvujhpvpl2.us-east-1.rds.amazonaws.com:5432/postgres' 
   # memorySize: 2048
   # logRetentionInDays: 5
   # timeout: 30
