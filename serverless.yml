@@ -30,5 +30,5 @@ package:
     - '!node_modules/@prisma/engines/**'
     - 'node_modules/@prisma/client/**'
   # individually: true
-  exclude:
-    - node_modules/**
+  # exclude:
+  #   - node_modules/**
