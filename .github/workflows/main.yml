@@ -47,3 +47,15 @@ jobs:
     - name: Push Docker image to ECR
       run: |
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
+  
+    - name: Install Serverless Framework
+      run: npm install -g serverless
+
+    # Package the application using Serverless Framework
+    - name: Serverless Package
+      run: serverless package --stage production
+
+    # Upload Serverless package to S3
+    - name: Upload Serverless package to S3
+      run: |
+        aws s3 cp ./serverless/.serverless/${{ github.sha }}.zip s3://${{ secrets.S3_BUCKET_NAME }}/${{ github.sha }}.zip
