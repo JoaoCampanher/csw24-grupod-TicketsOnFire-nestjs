@@ -6,7 +6,9 @@ provider:
   name: aws
   runtime: nodejs16.x
   stage: api
-  # region: ap-southeast-2
+  region: us-east-1
+  iam:
+    role: arn:aws:iam::911970324056:role/LabRole
   # memorySize: 2048
   # logRetentionInDays: 5
   # timeout: 30
@@ -28,5 +30,5 @@ package:
     - '!node_modules/@prisma/engines/**'
     - 'node_modules/@prisma/client/**'
   # individually: true
-  # exclude:
-  #   - node_modules/**
+  exclude:
+    - node_modules/**
