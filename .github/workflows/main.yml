@@ -28,14 +28,14 @@ jobs:
     - name: Install Dependencies
       run: npm install --production
 
-    - name: Install Serverless Offline
-      run: serverless plugin install -n serverless-offline
-
     # - name: Build Application
     #   run: npm run build
 
     - name: Install Serverless Framework
       run: npm -g install serverless@3
+
+    - name: Install Serverless Offline
+      run: serverless plugin install -n serverless-offline
       
     # Package the application using Serverless Framework
     - name: Serverless Package
