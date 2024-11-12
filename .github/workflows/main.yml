@@ -50,8 +50,6 @@ jobs:
   
     - name: Install Serverless Framework
       run: npm install -g serverless
-      
-    - name: Configure Serverless Credentials
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}      
       
