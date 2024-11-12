@@ -10,10 +10,7 @@ provider:
   iam:
     role: arn:aws:iam::911970324056:role/LabRole
   environment:
-    DATABASE_URL: 'postgresql://postgres:postgres@database-1.c5cvujhpvpl2.us-east-1.rds.amazonaws.com:5432/postgres' 
-  # memorySize: 2048
-  # logRetentionInDays: 5
-  # timeout: 30
+    DATABASE_URL: 'postgresql://postgres:postgres@database-1.c5cvujhpvpl2.us-east-1.rds.amazonaws.com:5432/postgres'
 
 functions:
   api:
@@ -22,17 +19,7 @@ functions:
       - http:
           method: any
           path: /{proxy+}
-# only include the Prisma binary required on AWS Lambda while packaging
-# package:
-#   patterns:
-#     - '!node_modules/.prisma/client/libquery_engine-*'
-#     - 'node_modules/.prisma/client/libquery_engine-rhel-*'
-#     - '!node_modules/prisma/libquery_engine-*'
-#     - '!node_modules/@prisma/engines/**'
-#     - 'node_modules/@prisma/client/**'
-# individually: true
-# exclude:
-#   - node_modules/**
+
 package:
   include:
     - node_modules/@vendia/serverless-express/**
