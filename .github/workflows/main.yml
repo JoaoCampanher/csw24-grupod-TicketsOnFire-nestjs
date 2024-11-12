@@ -29,6 +29,9 @@ jobs:
       run: npm install
 
     - name: Build Application
+      run: npm install @vendia/serverless-express
+      
+    - name: Build Application
       run: npm run build
 
     - name: Install Serverless Framework
