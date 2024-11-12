@@ -49,7 +49,7 @@ jobs:
     #     docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
   
     - name: Install Serverless Framework
-      run: npm -g install serverless@2
+      run: npm -g install serverless@3
       
     # Package the application using Serverless Framework
     - name: Serverless Package
