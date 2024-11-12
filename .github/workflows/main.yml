@@ -50,10 +50,10 @@ jobs:
   
     - name: Install Serverless Framework
       run: npm install -g serverless
-    - name: Authenticate with Serverless Framework
+      
+    - name: Configure Serverless Credentials
       run: |
-        export SERVERLESS_ACCESS_KEY=${{ secrets.SERVERLESS_ACCESS_KEY }}
-        serverless login --no-interactive
+        serverless config credentials --accessKeyId ${{ secrets.SERVERLESS_ACCESS_KEY_ID }} --secretAccessKey ${{ secrets.SERVERLESS_ACCESS_KEY_SECRET }} --provider aws --profile serverless
         
     # Package the application using Serverless Framework
     - name: Serverless Package
