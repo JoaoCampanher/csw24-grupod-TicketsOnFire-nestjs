@@ -20,15 +20,14 @@ functions:
       - http:
           method: any
           path: /{proxy+}
-
 # only include the Prisma binary required on AWS Lambda while packaging
-package:
-  patterns:
-    - '!node_modules/.prisma/client/libquery_engine-*'
-    - 'node_modules/.prisma/client/libquery_engine-rhel-*'
-    - '!node_modules/prisma/libquery_engine-*'
-    - '!node_modules/@prisma/engines/**'
-    - 'node_modules/@prisma/client/**'
-  # individually: true
-  # exclude:
-  #   - node_modules/**
+# package:
+#   patterns:
+#     - '!node_modules/.prisma/client/libquery_engine-*'
+#     - 'node_modules/.prisma/client/libquery_engine-rhel-*'
+#     - '!node_modules/prisma/libquery_engine-*'
+#     - '!node_modules/@prisma/engines/**'
+#     - 'node_modules/@prisma/client/**'
+# individually: true
+# exclude:
+#   - node_modules/**
