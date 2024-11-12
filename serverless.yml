@@ -15,7 +15,7 @@ provider:
 
 functions:
   api:
-    handler: lambda.handler
+    handler: src/lambda.handler
     events:
       - http:
           method: any
