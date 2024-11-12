@@ -26,10 +26,10 @@ jobs:
         aws-region: us-east-1 
 
     - name: Install Dependencies
-      run: npm install --production
+      run: npm install
 
-    # - name: Build Application
-    #   run: npm run build
+    - name: Build Application
+      run: npm run build
 
     - name: Install Serverless Framework
       run: npm -g install serverless@3
