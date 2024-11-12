@@ -26,7 +26,7 @@ jobs:
         aws-region: us-east-1 
 
     - name: Install Dependencies
-      run: npm install
+      run: npm install --production
 
     - name: Build Application
       run: npm run build
