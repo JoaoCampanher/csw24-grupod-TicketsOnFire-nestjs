@@ -10,6 +10,10 @@ export const handler = async (event, context) => {
     const nestApp = await NestFactory.create(AppModule);
     await nestApp.init();
 
+    const config = new DocumentBuilder().build();
+    const document = SwaggerModule.createDocument(nestApp, config);
+    SwaggerModule.setup('api', nestApp, document);
+
     cachedServer = serverlessExpress({
       app: nestApp.getHttpAdapter().getInstance(),
     });
