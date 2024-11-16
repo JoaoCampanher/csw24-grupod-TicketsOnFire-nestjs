@@ -18,7 +18,7 @@ functions:
     events:
       - http:
           method: any
-          path: api/{proxy+}
+          path: /{proxy+}
 
 package:
   include:
