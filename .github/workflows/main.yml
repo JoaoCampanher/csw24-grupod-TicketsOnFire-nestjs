@@ -40,6 +40,8 @@ jobs:
     - name: Serverless Deploy
       env:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        AWS_ROLE: ${{ secrets.AWS_ROLE }}
       run: |
         echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+        echo "AWS_ROLE=${{ secrets.AWS_ROLE }}" >> .env
         serverless deploy
