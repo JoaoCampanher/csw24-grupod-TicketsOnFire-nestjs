@@ -38,4 +38,8 @@ jobs:
       run: serverless plugin install -n serverless-offline
       
     - name: Serverless Deploy
-      run: serverless deploy
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: |
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+        serverless deploy
