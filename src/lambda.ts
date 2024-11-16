@@ -8,11 +8,12 @@ let cachedServer;
 export const handler = async (event, context) => {
   if (!cachedServer) {
     const nestApp = await NestFactory.create(AppModule);
-    await nestApp.init();
-
+    
     const config = new DocumentBuilder().build();
     const document = SwaggerModule.createDocument(nestApp, config);
-    SwaggerModule.setup('api', nestApp, document);
+    SwaggerModule.setup('swagger', nestApp, document);
+
+    await nestApp.init();
 
     cachedServer = serverlessExpress({
       app: nestApp.getHttpAdapter().getInstance(),
