@@ -8,9 +8,9 @@ provider:
   stage: api
   region: us-east-1
   iam:
-    role: arn:aws:iam::911970324056:role/LabRole
+    role: ${env:AWS_ROLE} 
   environment:
-    DATABASE_URL: 'postgresql://postgres:postgres@database-1.c5cvujhpvpl2.us-east-1.rds.amazonaws.com:5432/postgres'
+    DATABASE_URL: ${env:DATABASE_URL}
 
 functions:
   api:

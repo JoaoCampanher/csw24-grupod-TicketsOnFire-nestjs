@@ -27,9 +27,6 @@ jobs:
 
     - name: Install Dependencies
       run: npm install
-
-    - name: Generate Prisma Client
-      run: npx prisma generate
       
     - name: Build Application
       run: npm run build
@@ -40,6 +37,11 @@ jobs:
     - name: Install Serverless Offline
       run: serverless plugin install -n serverless-offline
       
-    # Package the application using Serverless Framework
-    - name: Serverless Package
-      run: serverless deploy
+    - name: Serverless Deploy
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        AWS_ROLE: ${{ secrets.AWS_ROLE }}
+      run: |
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+        echo "AWS_ROLE=${{ secrets.AWS_ROLE }}" >> .env
+        serverless deploy
