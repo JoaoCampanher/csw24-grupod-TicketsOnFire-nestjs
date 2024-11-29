@@ -1,16 +1,16 @@
 services:
-  # db:
-  #   image: postgres
-  #   restart: always
-  #   environment:
-  #     - POSTGRES_USER=ticketsonfire
-  #     - POSTGRES_PASSWORD=fire
-  #     - POSTGRES_DB=ticketsonfire
-  #   container_name: postgres
-  #   volumes:
-  #     - ./pgdata:/var/lib/postgresql/data
-  #   ports:
-  #     - '5432:5432'
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=ticketsonfire
+      - POSTGRES_PASSWORD=fire
+      - POSTGRES_DB=ticketsonfire
+    container_name: postgres
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
 
   app:
     build:
