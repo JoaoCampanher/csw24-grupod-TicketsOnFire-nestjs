@@ -1,4 +1,4 @@
-name: Build and Push Docker Image to ECR
+name: Build and Push Latest Docker Image to ECR
 
 on:
   push:
@@ -33,15 +33,10 @@ jobs:
           ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-app
         run: |
           IMAGE_NAME=my-app
-          GIT_SHA=$(echo $GITHUB_SHA | cut -c1-7) # Use the first 7 characters of the commit hash
-          docker build -t $IMAGE_NAME:$GIT_SHA .
-          docker tag $IMAGE_NAME:$GIT_SHA $ECR_URI:$GIT_SHA
-          docker tag $IMAGE_NAME:$GIT_SHA $ECR_URI:latest
+          docker build -t $IMAGE_NAME:latest .
 
       - name: Push Docker Image to ECR
         env:
           ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-app
         run: |
-          GIT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-          docker push $ECR_URI:$GIT_SHA
           docker push $ECR_URI:latest
