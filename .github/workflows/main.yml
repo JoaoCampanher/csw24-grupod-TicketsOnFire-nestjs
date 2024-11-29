@@ -1,47 +1,47 @@
-name: Test
+name: Build and Push Docker Image to ECR
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
 
 permissions:
   contents: read
 
 jobs:
-  deploy:
-    name: Deploy App
+  build-and-push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: us-east-1 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
 
-    - name: Install Dependencies
-      run: npm install
-      
-    - name: Build Application
-      run: npm run build
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Install Serverless Framework
-      run: npm -g install serverless@3
+      - name: Build Docker Image
+        env:
+          ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-app
+        run: |
+          IMAGE_NAME=my-app
+          GIT_SHA=$(echo $GITHUB_SHA | cut -c1-7) # Use the first 7 characters of the commit hash
+          docker build -t $IMAGE_NAME:$GIT_SHA .
+          docker tag $IMAGE_NAME:$GIT_SHA $ECR_URI:$GIT_SHA
+          docker tag $IMAGE_NAME:$GIT_SHA $ECR_URI:latest
 
-    - name: Install Serverless Offline
-      run: serverless plugin install -n serverless-offline
-      
-    - name: Serverless Deploy
-      env:
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        AWS_ROLE: ${{ secrets.AWS_ROLE }}
-      run: |
-        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-        echo "AWS_ROLE=${{ secrets.AWS_ROLE }}" >> .env
-        serverless deploy
+      - name: Push Docker Image to ECR
+        env:
+          ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/my-app
+        run: |
+          GIT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          docker push $ECR_URI:$GIT_SHA
+          docker push $ECR_URI:latest
