@@ -29,10 +29,14 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build Docker Image
-        env:
         run: docker build -t nestjs-api:latest .
+
+      - name: Tag Docker image for ECR
+        env:
+          ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/nestjs-api
+        run: docker tag nestjs-api:latest $ECR_URI
 
       - name: Push Docker Image to ECR
         env:
           ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/nestjs-api
-        run: docker push nestjs-api:latest
+        run: docker push $ECR_URI
