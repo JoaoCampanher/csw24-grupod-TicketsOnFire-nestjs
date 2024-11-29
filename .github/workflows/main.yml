@@ -32,11 +32,10 @@ jobs:
         env:
           ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/nestjs-api
         run: |
-          IMAGE_NAME=nestjs-api
-          docker build -t $IMAGE_NAME:latest .
+          docker build -t nestjs-api:latest .
 
       - name: Push Docker Image to ECR
         env:
           ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/nestjs-api
         run: |
-          docker push $ECR_URI:latest
+          docker push nestjs-api:latest
