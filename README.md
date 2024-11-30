@@ -1,59 +1,79 @@
+# Projeto NestJS com Deploy AWS
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-### Passos para rodar o projeto
+## Instruções para Configuração e Deploy
 
-1. **Atualizar as Credenciais AWS**  
-   Atualize as credenciais no arquivo localizado em `~/.aws/credentials` com as fornecidas no seu AWS Lab:
+Este projeto utiliza **Terraform** para provisionar os recursos na AWS e uma pipeline de **CI/CD** para construir e publicar a imagem Docker no **Amazon ECR**.
 
-   ```ini
-   [default]
-   aws_access_key_id = SUA_AWS_ACCESS_KEY_ID
-   aws_secret_access_key = SUA_AWS_SECRET_ACCESS_KEY
-   aws_session_token = SEU_AWS_SESSION_TOKEN
-   ```
+---
 
-2. **Inicializar e Aplicar o Terraform**  
-   Navegue até a pasta `terraform` e execute os seguintes comandos:
+### Passos para Configuração
+
+1. **Adicionar Secrets ao Repositório do GitHub**  
+   Antes de executar a pipeline, adicione os seguintes _secrets_ no repositório do GitHub para configurar o CI/CD:
+
+   - **`AWS_ACCESS_KEY_ID`**: Sua chave de acesso AWS.
+   - **`AWS_ACCOUNT_ID`**: O ID da sua conta AWS.
+   - **`AWS_SECRET_ACCESS_KEY`**: A chave secreta de acesso AWS.
+   - **`AWS_SESSION_TOKEN`**: O token de sessão AWS.
+
+2. **Executar a Pipeline do GitHub Actions**  
+   Após configurar os _secrets_, faça um _push_ para a branch `main` do repositório. Isso acionará automaticamente a pipeline de **CI/CD**, que:
+
+   - Constrói a imagem Docker.
+   - Publica a imagem no **Amazon ECR**.
+
+   **Nota**: Certifique-se de que o processo foi concluído antes de seguir para o próximo passo.
+
+3. **Configurar e Executar o Terraform**  
+   Navegue até a pasta `terraform` do projeto e execute os seguintes comandos:
 
    ```bash
    # Inicializar o Terraform
    terraform init
 
-   # Aplicar o Terraform (pode levar alguns minutos para criar o banco de dados)
+   # Aplicar o Terraform
    terraform apply
    ```
 
-3. **Obter a URL do Banco de Dados**  
-   Após a criação dos recursos, use o seguinte comando para obter a URL do banco de dados:
+   **Observação**: Esse processo pode levar até **10 minutos** para criar todos os recursos na AWS, incluindo o banco de dados, ALB, ECS, e mais.
+
+4. **Aguardar a Configuração Completa na AWS**  
+   Após o Terraform finalizar, a **AWS pode levar mais alguns minutos** para provisionar completamente as tasks no ECS. Durante esse tempo, o serviço pode não estar acessível. Aguarde até que as tasks sejam criadas corretamente.
+
+5. **Obter a URL do Load Balancer**  
+   Após o término do processo de criação das tasks, execute o comando abaixo para obter a URL do ALB (Application Load Balancer):
 
    ```bash
-   terraform output database_url
+   terraform output alb_dns
    ```
 
-4. **Atualizar o `.env`**  
-   No diretório do projeto, atualize o arquivo `.env` com a `DATABASE_URL` obtida no passo anterior. Certifique-se de que ele fique parecido com:
+6. **Acessar o Swagger**  
+   Acesse a URL exibida com a porta **3000** e o caminho `/api` para visualizar e interagir com a API Swagger:
 
-   ```env
-   DATABASE_URL=postgresql://usuario:senha@endereco-do-banco:5432/nome-do-banco
+   ```
+   http://<ALB_URL>:3000/api
    ```
 
-5. **Aplicar as Migrações Prisma**  
-   Execute o seguinte comando para aplicar as migrações ao banco de dados:
+   Este será o endpoint da sua aplicação rodando diretamente no ECS com um banco de dados postgres novinho em folha.
 
-   ```bash
-   npx prisma migrate deploy
-   ```
+---
 
-### Configurar o CI/CD
+## Sobre a Pipeline de CI/CD
 
-Para que a pipeline de CI/CD seja executada corretamente, é necessário adicionar os seguintes *secrets* no repositório do GitHub:
+A pipeline de CI/CD no GitHub Actions realiza os seguintes passos:
 
-- **`AWS_ACCESS_KEY_ID`**: Chave de acesso AWS.
-- **`AWS_SECRET_ACCESS_KEY`**: Chave secreta de acesso AWS.
-- **`AWS_SESSION_TOKEN`**: Token de sessão AWS.
-- **`AWS_ROLE`**: Função IAM utilizada pelo pipeline.
-- **`DATABASE_URL`**: URL do banco de dados, obtida no passo 3.
+- Constrói a imagem Docker.
+- Publica a imagem no **Amazon ECR**.
+- Atualiza o serviço ECS para usar a nova imagem.
 
-Após adicionar esses *secrets*, o repositório estará configurado para utilizar a pipeline de CI/CD e funcionar automaticamente. 🚀
+Certifique-se de que os _secrets_ foram configurados antes de realizar um _push_ para a branch `main`, pois isso acionará automaticamente a pipeline.
+
+---
+
+### Tudo pronto! 🚀
+
+Agora você pode usar a aplicação com um banco de dados novo provisionado pela AWS, tudo gerenciado de forma automática. Apenas lembre-se de aguardar o tempo necessário para que todos os recursos na AWS sejam completamente criados.
