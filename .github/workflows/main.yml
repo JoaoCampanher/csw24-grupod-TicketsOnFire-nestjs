@@ -1,4 +1,4 @@
-name: Build and Push Latest Docker Image to ECR
+name: Build, Push, and Deploy Latest Docker Image to ECR
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build-and-push:
-    name: Build and Push Docker Image
+    name: Build, Push, and Deploy Docker Image
     runs-on: ubuntu-latest
 
     steps:
@@ -40,3 +40,29 @@ jobs:
         env:
           ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/nestjs-api
         run: docker push $ECR_URI
+
+      - name: Check if ECS Service Exists
+        id: check-ecs
+        env:
+          CLUSTER_NAME: nestjs-ecs-cluster
+          SERVICE_NAME: nestjs-service
+        run: |
+          if ! aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME; then
+            echo "Service does not exist."
+            echo "exists=false" >> $GITHUB_ENV
+          else
+            echo "Service exists."
+            echo "exists=true" >> $GITHUB_ENV
+          fi
+
+      - name: Update ECS Service
+        if: env.exists == 'true'
+        env:
+          CLUSTER_NAME: nestjs-ecs-cluster
+          SERVICE_NAME: nestjs-service
+          CONTAINER_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/nestjs-api:latest
+        run: |
+          aws ecs update-service \
+            --cluster $CLUSTER_NAME \
+            --service $SERVICE_NAME \
+            --force-new-deployment

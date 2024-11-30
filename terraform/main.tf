@@ -5,28 +5,26 @@ provider "aws" {
 resource "aws_vpc" "main_vpc" {
   cidr_block = "10.0.0.0/16"
 
+  enable_dns_support = true  
+  enable_dns_hostnames = true 
+
   tags = {
     Name = "Main VPC"
   }
 }
 
-resource "aws_subnet" "public_subnet" {
-  vpc_id     = aws_vpc.main_vpc.id
-  cidr_block = "10.0.1.0/24"
+resource "aws_subnet" "subnet1" {
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
-
-  tags = {
-    Name = "Public Subnet"
-  }
 }
 
-resource "aws_subnet" "private_subnet" {
-  vpc_id     = aws_vpc.main_vpc.id
-  cidr_block = "10.0.2.0/24"
-
-  tags = {
-    Name = "Private Subnet"
-  }
+resource "aws_subnet" "subnet2" {
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = true
 }
 
 resource "aws_security_group" "ecs_security_group" {
@@ -35,8 +33,8 @@ resource "aws_security_group" "ecs_security_group" {
   description = "Allow access to ECS containers"
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # ALB
   }
@@ -79,21 +77,23 @@ resource "aws_db_instance" "nestjs_rds" {
   username                = "postgres"
   password                = "securepassword"
   vpc_security_group_ids  = [aws_security_group.rds_security_group.id]
-  publicly_accessible     = false
+  publicly_accessible     = true
   skip_final_snapshot     = true
-  subnet_group_name       = aws_db_subnet_group.db_subnet_group.name
+  db_subnet_group_name    = aws_db_subnet_group.db_subnet_group.name # Corrected this line
 
   tags = {
     Name = "NestJS RDS Database"
   }
 }
 
+
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "db-subnet-group"
-  subnet_ids = [aws_subnet.private_subnet.id]
+  name        = "nestjs-db-subnet-group"
+  subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]  # Add subnets from two different AZs
+  description = "Subnet group for NestJS RDS database"
 
   tags = {
-    Name = "RDS Subnet Group"
+    Name = "NestJS RDS Subnet Group"
   }
 }
 
@@ -108,10 +108,12 @@ resource "aws_ecs_task_definition" "task_definition" {
   cpu                      = "256"
   memory                   = "512"
 
+  execution_role_arn = "arn:aws:iam::911970324056:role/LabRole" 
+
   container_definitions = jsonencode([
     {
       name = "nestjs-container"
-      image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/nestjs-image:latest"
+      image = "911970324056.dkr.ecr.us-east-1.amazonaws.com/nestjs-api"
       portMappings = [
         {
           containerPort = 3000
@@ -133,14 +135,20 @@ resource "aws_lb" "ecs_alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs_security_group.id]
-  subnets            = [aws_subnet.public_subnet.id]
+  subnets            = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]  # Subnets from different AZs
 
   enable_deletion_protection = false
+  enable_http2               = true
+
+  tags = {
+    Name = "ECS ALB"
+  }
 }
+
 
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.ecs_alb.arn
-  port              = 80
+  port              = 3000
   protocol          = "HTTP"
 
   default_action {
@@ -151,27 +159,68 @@ resource "aws_lb_listener" "alb_listener" {
 
 resource "aws_lb_target_group" "ecs_target_group" {
   name        = "ecs-target-group"
-  port        = 80
+  port        = 3000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main_vpc.id
   target_type = "ip"
+
+    health_check {
+    path                = "/health"
+    interval            = 30
+    timeout             = 10
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main_vpc.id
+
+  tags = {
+    Name = "Main Internet Gateway"
+  }
+}
+
+
+resource "aws_route_table" "main_route_table" {
+  vpc_id = aws_vpc.main_vpc.id
+}
+
+resource "aws_route" "internet_route" {
+  route_table_id         = aws_route_table.main_route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
+}
+
+resource "aws_route_table_association" "subnet1_route_association" {
+  subnet_id      = aws_subnet.subnet1.id
+  route_table_id = aws_route_table.main_route_table.id
+}
+
+resource "aws_route_table_association" "subnet2_route_association" {
+  subnet_id      = aws_subnet.subnet2.id
+  route_table_id = aws_route_table.main_route_table.id
 }
 
 resource "aws_ecs_service" "ecs_service" {
+  depends_on = [
+    aws_lb_listener.alb_listener
+  ]
   name            = "nestjs-service"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.task_definition.arn
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = [aws_subnet.public_subnet.id]
+    subnets         = [aws_subnet.subnet1.id]
     security_groups = [aws_security_group.ecs_security_group.id]
+    assign_public_ip = true
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_target_group.arn
     container_name   = "nestjs-container"
-    container_port   = 80
+    container_port   = 3000
   }
 
   desired_count = 1
