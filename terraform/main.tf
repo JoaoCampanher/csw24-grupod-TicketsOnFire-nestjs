@@ -36,7 +36,7 @@ resource "aws_security_group" "ecs_security_group" {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # ALB
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -56,7 +56,7 @@ resource "aws_security_group" "rds_security_group" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    security_groups = [aws_security_group.ecs_security_group.id] # Only ECS can access
+    security_groups = [aws_security_group.ecs_security_group.id]
   }
 
   egress {
@@ -79,7 +79,7 @@ resource "aws_db_instance" "nestjs_rds" {
   vpc_security_group_ids  = [aws_security_group.rds_security_group.id]
   publicly_accessible     = true
   skip_final_snapshot     = true
-  db_subnet_group_name    = aws_db_subnet_group.db_subnet_group.name # Corrected this line
+  db_subnet_group_name    = aws_db_subnet_group.db_subnet_group.name
 
   tags = {
     Name = "NestJS RDS Database"
@@ -89,7 +89,7 @@ resource "aws_db_instance" "nestjs_rds" {
 
 resource "aws_db_subnet_group" "db_subnet_group" {
   name        = "nestjs-db-subnet-group"
-  subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]  # Add subnets from two different AZs
+  subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
   description = "Subnet group for NestJS RDS database"
 
   tags = {
@@ -108,12 +108,12 @@ resource "aws_ecs_task_definition" "task_definition" {
   cpu                      = "256"
   memory                   = "512"
 
-  execution_role_arn = "arn:aws:iam::911970324056:role/LabRole" 
+  execution_role_arn = "arn:aws:iam::<AWS_ACCOUNT_ID>:role/LabRole" 
 
   container_definitions = jsonencode([
     {
       name = "nestjs-container"
-      image = "911970324056.dkr.ecr.us-east-1.amazonaws.com/nestjs-api"
+      image = "<AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/nestjs-api"
       portMappings = [
         {
           containerPort = 3000
@@ -135,7 +135,7 @@ resource "aws_lb" "ecs_alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs_security_group.id]
-  subnets            = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]  # Subnets from different AZs
+  subnets            = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 
   enable_deletion_protection = false
   enable_http2               = true
